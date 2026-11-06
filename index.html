@@ -1,0 +1,581 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Kultara Access</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: satu kolom aplikasi (maks 960px). Splash -> masuk/daftar -> beranda berisi tiga menu yang membuka opsi -> halaman data. */
+:root{
+  --bg:#FFF4D6; --surface:#FFFCF3; --ink:#3A2A0C; --muted:#7B6540; --line:#EFDDA9;
+  --brand:#E3AE36; --brand-ink:#3A2A0C; --brand-deep:#8C5E0A; --soft:#FBEBBE; --gold:#C9921C;
+  --grad:linear-gradient(135deg,#F6D473 0%,#E3AE36 55%,#CC931F 100%);
+  --good:#2F7D4E; --info:#2F6DB3; --warn:#8E48A8; --bad:#B3402F;
+  --good-bg:#E1F1DF; --info-bg:#E0EAF6; --warn-bg:#F1E3F6; --bad-bg:#F9E0D9;
+  --f-display:"Fredoka","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1C1407; --surface:#271C0B; --ink:#FBEFCC; --muted:#BCA570; --line:#4B3A17;
+  --brand:#F0C25A; --brand-ink:#2E1F05; --brand-deep:#F0C25A; --soft:#37290F; --gold:#F0C25A;
+  --grad:linear-gradient(135deg,#F8DA84 0%,#F0C25A 55%,#D9A532 100%);
+  --good:#6FD49A; --info:#86B6EE; --warn:#D6A2EC; --bad:#F29A87;
+  --good-bg:#17331F; --info-bg:#172B44; --warn-bg:#35213F; --bad-bg:#3E2019; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1C1407; --surface:#271C0B; --ink:#FBEFCC; --muted:#BCA570; --line:#4B3A17;
+  --brand:#F0C25A; --brand-ink:#2E1F05; --brand-deep:#F0C25A; --soft:#37290F; --gold:#F0C25A;
+  --grad:linear-gradient(135deg,#F8DA84 0%,#F0C25A 55%,#D9A532 100%);
+  --good:#6FD49A; --info:#86B6EE; --warn:#D6A2EC; --bad:#F29A87;
+  --good-bg:#17331F; --info-bg:#172B44; --warn-bg:#35213F; --bad-bg:#3E2019; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;min-height:100vh}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--surface);z-index:10}
+h1,h2,h3{font-family:var(--f-display);line-height:1.15;margin:0;text-wrap:balance}
+p{margin:0}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--brand-deep);outline-offset:2px}
+.wrap{width:100%;max-width:960px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.muted{color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--surface);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.brand b{font-family:var(--f-display);font-size:18px;white-space:nowrap}
+.brand small{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);line-height:1}
+.who{display:flex;align-items:center;gap:10px;font-size:13px;min-width:0}
+.who span{max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+main{padding-block:20px 48px;display:flex;flex-direction:column;gap:18px}
+
+/* buttons / fields */
+.btn{border:0;border-radius:999px;padding:11px 22px;background:var(--grad);color:var(--brand-ink);font-weight:800;min-height:46px;box-shadow:0 2px 0 rgba(140,94,10,.35),0 6px 14px -6px rgba(201,146,28,.6)}
+.btn:hover{filter:brightness(1.06)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line);box-shadow:none;font-weight:700}
+.btn.sm{padding:6px 14px;min-height:36px;font-size:13px}
+.btn.danger{background:var(--bad);color:#fff;box-shadow:none}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label{font-size:13px;font-weight:600}
+.field input,.field select{border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:10px 14px;min-height:46px;width:100%}
+.field input:focus,.field select:focus{border-color:var(--brand)}
+.hint{font-size:12.5px;color:var(--muted)}
+.err{font-size:13px;color:var(--bad);background:var(--bad-bg);border-radius:8px;padding:8px 12px}
+.seg{display:inline-flex;background:var(--soft);border-radius:999px;padding:4px;gap:2px;max-width:100%}
+.seg button{border:0;background:transparent;border-radius:999px;padding:7px 16px;font-weight:700;font-size:13.5px;color:var(--muted);min-height:36px}
+.seg button[aria-pressed="true"]{background:var(--grad);color:var(--brand-ink);box-shadow:0 1px 3px rgba(140,94,10,.35)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 8px 20px -14px rgba(140,94,10,.45)}
+
+/* splash + auth */
+.center{min-height:78vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center}
+.splash h1{font-size:clamp(36px,9vw,56px);color:var(--ink);display:flex;align-items:flex-start;gap:6px}
+.splash .sub{letter-spacing:.2em;text-transform:uppercase;font-size:12.5px;color:var(--muted);font-weight:700}
+.splash .bar{width:150px;height:6px;background:var(--soft);border-radius:6px;overflow:hidden;margin-top:10px}
+.splash .bar i{display:block;height:100%;width:0;background:var(--grad);border-radius:6px;animation:fill 2.6s linear forwards}
+.spark{color:var(--brand);animation:twinkle 2.2s ease-in-out infinite}
+.logowrap{filter:drop-shadow(0 12px 18px rgba(201,146,28,.45))}
+@keyframes fill{to{width:100%}}
+@keyframes twinkle{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.25) rotate(18deg)}}
+.authbox{width:100%;max-width:420px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+.authbox form{display:flex;flex-direction:column;gap:14px}
+.otp{font-family:var(--f-display);font-size:28px;letter-spacing:.5em;text-align:center}
+.demo{border:2px dashed var(--brand);border-radius:14px;padding:10px 14px;font-size:13px;background:var(--soft)}
+.demo b{font-family:var(--f-display);font-size:20px;letter-spacing:.2em}
+
+/* home */
+.hello h2{font-size:26px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px 16px}
+.stat b{display:block;font-family:var(--f-display);font-size:26px;line-height:1.1}
+.stat span{font-size:12.5px;color:var(--muted)}
+.menus{display:flex;flex-direction:column;gap:12px}
+.menu{background:var(--surface);border:1px solid var(--line);border-radius:26px;overflow:hidden;box-shadow:0 8px 20px -14px rgba(140,94,10,.45)}
+.menu>button{all:unset;box-sizing:border-box;width:100%;display:flex;align-items:center;gap:14px;padding:18px;cursor:pointer}
+.menu>button:focus-visible{outline:3px solid var(--brand-deep);outline-offset:-3px}
+.ico{width:50px;height:50px;border-radius:18px;background:var(--grad);color:var(--brand-ink);display:grid;place-items:center;flex:none;box-shadow:0 3px 0 rgba(140,94,10,.3)}
+.menu h3{font-size:19px}
+.menu .chev{margin-left:auto;transition:transform .2s;color:var(--muted)}
+.menu[data-open="true"] .chev{transform:rotate(90deg)}
+.opts{display:none;gap:10px;padding:0 18px 18px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.menu[data-open="true"] .opts{display:grid}
+.opt{border:2px solid transparent;background:var(--soft);border-radius:18px;padding:14px 16px;text-align:left;font-weight:800;display:flex;flex-direction:column;gap:2px}
+.opt small{font-weight:600;color:var(--muted);font-size:12.5px}
+.opt:hover{border-color:var(--brand)}
+
+/* page head */
+.crumb{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.crumb h2{font-size:24px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.between{justify-content:space-between}
+.period{display:flex;align-items:center;gap:8px}
+.period b{font-family:var(--f-display);font-size:19px;min-width:0}
+.iconbtn{border:2px solid var(--line);background:var(--surface);border-radius:50%;width:42px;height:42px;display:grid;place-items:center;font-weight:800}
+
+/* table */
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:22px}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:0}
+td.n{text-align:center;font-variant-numeric:tabular-nums}
+th.n{text-align:center}
+.pct{display:flex;align-items:center;gap:8px;min-width:120px}
+.pct i{flex:1;height:6px;background:var(--soft);border-radius:4px;overflow:hidden;display:block}
+.pct i s{display:block;height:100%;background:var(--grad);border-radius:4px}
+.pct span{width:38px;text-align:right;font-variant-numeric:tabular-nums;font-weight:600;font-size:13px}
+
+/* chart */
+.chart{display:flex;align-items:flex-end;gap:3px;height:130px;border-bottom:1px solid var(--line);padding-top:6px;background:
+  linear-gradient(var(--line),var(--line)) 0 0/100% 1px no-repeat,linear-gradient(var(--line),var(--line)) 0 50%/100% 1px no-repeat}
+.chart .b{flex:1;min-width:2px;display:flex;align-items:flex-end;height:100%}
+.chart .b i{display:block;width:100%;background:var(--grad);border-radius:6px 6px 0 0;min-height:2px}
+.chart .b.e i{background:var(--line);height:2px!important}
+.axis{display:flex;gap:3px;font-size:11px;color:var(--muted);margin-top:4px}
+.axis span{flex:1;min-width:0;display:flex;justify-content:center;white-space:nowrap}
+
+/* santri list */
+.group{display:flex;flex-direction:column;gap:8px}
+.group h3{font-size:16px;display:flex;align-items:center;gap:8px}
+.group h3 em{font-style:normal;font-family:var(--f-body);font-size:12.5px;color:var(--muted);font-weight:500}
+.santri{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:10px 14px}
+.av{width:40px;height:40px;border-radius:50%;background:var(--soft);color:var(--brand-deep);display:grid;place-items:center;font-family:var(--f-display);font-weight:600;flex:none;border:2px solid var(--brand)}
+.santri .nm{flex:1;min-width:0}
+.santri .nm b{display:block;overflow:hidden;text-overflow:ellipsis}
+.tag{font-size:11px;border-radius:999px;padding:1px 9px;background:var(--soft);color:var(--brand-deep);font-weight:800;margin-left:6px}
+
+/* absensi */
+.rollcall{display:flex;flex-direction:column;gap:8px}
+.rc{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:10px 14px}
+.rc .nm{flex:1 1 150px;min-width:0;font-weight:700}
+.st{display:flex;gap:4px}
+.st button{border:2px solid var(--line);background:transparent;border-radius:999px;padding:6px 12px;font-size:13px;font-weight:700;min-height:36px;color:var(--muted)}
+.st button[aria-pressed="true"][data-v="hadir"]{background:var(--good-bg);color:var(--good);border-color:var(--good)}
+.st button[aria-pressed="true"][data-v="izin"]{background:var(--info-bg);color:var(--info);border-color:var(--info)}
+.st button[aria-pressed="true"][data-v="sakit"]{background:var(--warn-bg);color:var(--warn);border-color:var(--warn)}
+.st button[aria-pressed="true"][data-v="alfa"]{background:var(--bad-bg);color:var(--bad);border-color:var(--bad)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.empty{text-align:center;padding:28px 16px;display:flex;flex-direction:column;gap:10px;align-items:center;background:var(--surface);border:2px dashed var(--line);border-radius:24px}
+.empty h3{font-size:18px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:max(20px,env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;z-index:20;max-width:90vw}
+.foot{font-size:12px;color:var(--muted);text-align:center;padding-top:8px}
+@media (prefers-reduced-motion:reduce){.splash .bar i{animation-duration:.01s}.spark{animation:none}.menu .chev{transition:none}}
+</style>
+
+<div id="app"></div>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+/* ---------- util ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const weekStart=d=>addDays(d,-((d.getDay()+6)%7));
+const fmt=(d,o)=>d.toLocaleDateString('id-ID',o);
+const uid=()=>'s'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+let toastT;
+function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,3200)}
+
+const LOGO=`<svg viewBox="0 0 64 64" width="SZ" height="SZ" role="img" aria-label="Logo Kultara Access">
+<defs><mask id="mk"><rect width="64" height="64" fill="#fff"/><circle cx="38" cy="26" r="15" fill="#000"/></mask>
+<linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F6D473"/><stop offset=".55" stop-color="#E3AE36"/><stop offset="1" stop-color="#C98F1D"/></linearGradient></defs>
+<rect width="64" height="64" rx="21" fill="url(#lg)"/>
+<circle cx="29" cy="33" r="18" fill="#FFFDF4" mask="url(#mk)"/>
+<text x="43" y="47" font-family="Fredoka,Trebuchet MS,sans-serif" font-weight="600" font-size="23" fill="#3A2A0C" text-anchor="middle">7</text>
+<path d="M51 9l1.9 4.9 4.9 1.9-4.9 1.9L51 22.6l-1.9-4.9-4.9-1.9 4.9-1.9z" fill="#FFFDF4"/>
+</svg>`;
+const SPARK='<svg class="spark" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1l2.6 7.4L22 11l-7.4 2.6L12 21l-2.6-7.4L2 11l7.4-2.6z" fill="currentColor"/></svg>';
+const logo=sz=>LOGO.replace(/SZ/g,sz);
+
+/* ---------- penyimpanan: IndexedDB "smart-access-kultum" ----------
+   accounts (kunci: contact) · santri (id) · kultum (id = tanggal_idSantri) · meta (sesi login) */
+const DB_NAME='smart-access-kultum',DB_VER=1;
+const KEY={accounts:'contact',santri:'id',kultum:'id',meta:'key'};
+const idb={
+  db:null,mem:null,
+  open(){
+    return new Promise((res,rej)=>{
+      if(!window.indexedDB)return rej(new Error('IndexedDB tidak tersedia'));
+      let rq;try{rq=indexedDB.open(DB_NAME,DB_VER)}catch(e){return rej(e)}
+      rq.onupgradeneeded=()=>{
+        const d=rq.result;
+        if(!d.objectStoreNames.contains('accounts'))d.createObjectStore('accounts',{keyPath:'contact'});
+        if(!d.objectStoreNames.contains('santri')){const s=d.createObjectStore('santri',{keyPath:'id'});s.createIndex('jenis','jenis')}
+        if(!d.objectStoreNames.contains('kultum')){const s=d.createObjectStore('kultum',{keyPath:'id'});s.createIndex('tanggal','tanggal');s.createIndex('santriId','santriId')}
+        if(!d.objectStoreNames.contains('meta'))d.createObjectStore('meta',{keyPath:'key'});
+      };
+      rq.onsuccess=()=>{this.db=rq.result;this.db.onversionchange=()=>this.db.close();res()};
+      rq.onerror=()=>rej(rq.error);
+      rq.onblocked=()=>rej(new Error('IndexedDB diblokir'));
+    });
+  },
+  useMemory(){this.mem=Object.fromEntries(Object.keys(KEY).map(k=>[k,new Map()]))},
+  req(s,fn){return new Promise((res,rej)=>{const r=fn(this.db.transaction(s,'readonly').objectStore(s));r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})},
+  all(s){return this.mem?Promise.resolve([...this.mem[s].values()]):this.req(s,o=>o.getAll())},
+  get(s,k){return this.mem?Promise.resolve(this.mem[s].get(k)):this.req(s,o=>o.get(k))},
+  /* ops: [['santri','put',objek] | ['santri','delete',kunci] | ['santri','clear']]; semua dalam satu transaksi */
+  run(ops){
+    if(this.mem){
+      for(const [s,op,v] of ops){if(op==='put')this.mem[s].set(v[KEY[s]],v);else if(op==='delete')this.mem[s].delete(v);else this.mem[s].clear()}
+      return Promise.resolve();
+    }
+    return new Promise((res,rej)=>{
+      const t=this.db.transaction([...new Set(ops.map(o=>o[0]))],'readwrite');
+      t.oncomplete=()=>res();t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error||new Error('Transaksi dibatalkan'));
+      for(const [s,op,v] of ops){const o=t.objectStore(s);if(op==='put')o.put(v);else if(op==='delete')o.delete(v);else o.clear()}
+    });
+  }
+};
+const store={santri:[],kultum:[],persistent:true,ready:false,bc:null,
+  async init(){
+    try{await idb.open()}catch(e){idb.useMemory();this.persistent=false}
+    await this.reload();
+    const ses=await idb.get('meta','session');
+    if(ses){const acc=await idb.get('accounts',ses.contact);if(acc)S.user={nama:acc.nama,contact:acc.contact}}
+    try{this.bc=new BroadcastChannel('smart-access');this.bc.onmessage=async()=>{await this.reload();softRender()}}catch(e){}
+    this.ready=true;
+    if(!this.persistent)toast('Penyimpanan browser tidak tersedia. Data hilang saat halaman ditutup.');
+  },
+  async reload(){
+    this.santri=await idb.all('santri');
+    this.kultum=(await idb.all('kultum')).map(r=>r.status==='alpa'?{...r,status:'alfa'}:r);
+  },
+  async write(ops){await idb.run(ops);await this.reload();try{this.bc&&this.bc.postMessage('berubah')}catch(e){}},
+  saveSantri(rows){return this.write(rows.map(r=>['santri','put',r]))},
+  saveKultum(rows){return this.write(rows.map(r=>['kultum','put',r]))},
+  removeSantri(ids){
+    const set=new Set(ids);
+    return this.write([...ids.map(id=>['santri','delete',id]),...this.kultum.filter(r=>set.has(r.santriId)).map(r=>['kultum','delete',r.id])]);
+  }
+};
+const writeErr=e=>toast('Gagal menyimpan ke penyimpanan browser. Coba lagi.');
+
+/* ---------- state ---------- */
+const S={screen:'splash',user:null,open:null,view:'home',
+  lap:{p:'minggu',anchor:new Date(),jenis:'semua'},
+  nama:{jenis:'putra'},delId:null,
+  abs:{tanggal:ymd(new Date()),jenis:'putra',kelas:'semua',tema:'',st:{},saving:false},
+  add:{nama:'',jenis:'putra',kelas:''}};
+const A={tab:'masuk',step:'form',nama:'',contact:'',code:'',input:'',err:''};
+
+/* ---------- helpers data ---------- */
+const smap=()=>Object.fromEntries(store.santri.map(s=>[s.id,s]));
+const kelasList=()=>[...new Set(store.santri.map(s=>s.kelas).filter(Boolean))].sort();
+function range(p,d){
+  if(p==='minggu'){const s=weekStart(d);return [s,addDays(s,6)]}
+  if(p==='bulan')return [new Date(d.getFullYear(),d.getMonth(),1),new Date(d.getFullYear(),d.getMonth()+1,0)];
+  return [new Date(d.getFullYear(),0,1),new Date(d.getFullYear(),11,31)];
+}
+function rangeLabel(p,d){
+  const [a,b]=range(p,d);
+  if(p==='minggu')return `${fmt(a,{day:'numeric',month:'short'})} – ${fmt(b,{day:'numeric',month:'short',year:'numeric'})}`;
+  if(p==='bulan')return fmt(a,{month:'long',year:'numeric'});
+  return String(a.getFullYear());
+}
+function recsIn(a,b,jenis){
+  const m=smap(),x=ymd(a),y=ymd(b);
+  return store.kultum.filter(r=>r.tanggal>=x&&r.tanggal<=y&&m[r.santriId]&&(jenis==='semua'||m[r.santriId].jenis===jenis));
+}
+const pctOf=(h,t)=>t?Math.round(h/t*100):null;
+
+/* ---------- views ---------- */
+function splash(){return `<div class="wrap"><div class="center splash"><span class="logowrap">${logo(120)}</span><h1>Kultara Access${SPARK}</h1><div class="sub">Kultum · Kuliah 7 Menit</div><div class="bar"><i></i></div><button class="btn ghost sm" data-act="skip" style="margin-top:8px">Lanjut</button></div></div>`}
+
+function auth(){
+  const masuk=A.tab==='masuk';
+  let body;
+  if(A.step==='form'){
+    body=`<form data-form="auth1" novalidate>
+      ${masuk?'':`<div class="field"><label for="a-nama">Nama lengkap</label><input id="a-nama" name="nama" autocomplete="name" value="${esc(A.nama)}" placeholder="Nama pengurus atau ustadz"></div>`}
+      <div class="field"><label for="a-contact">Email atau nomor telepon</label><input id="a-contact" name="contact" autocomplete="username" value="${esc(A.contact)}" placeholder="nama@email.com atau 0812xxxxxxx"></div>
+      ${A.err?`<div class="err" role="alert">${esc(A.err)}</div>`:''}
+      <button class="btn" type="submit">${masuk?'Kirim kode verifikasi':'Buat akun dan kirim kode'}</button>
+    </form>`;
+  }else{
+    body=`<form data-form="auth2" novalidate>
+      <p class="muted">Masukkan 6 digit kode verifikasi untuk <b>${esc(A.contact)}</b>.</p>
+      <div class="demo">Mode contoh: halaman ini belum terhubung ke layanan email atau SMS, jadi kode tampil di sini.<br>Kode Anda <b class="num">${esc(A.code)}</b></div>
+      <div class="field"><label for="a-kode">Kode verifikasi</label><input class="otp" id="a-kode" name="kode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" value="${esc(A.input)}"></div>
+      ${A.err?`<div class="err" role="alert">${esc(A.err)}</div>`:''}
+      <button class="btn" type="submit">Verifikasi akun</button>
+      <div class="row between"><button class="btn ghost sm" type="button" data-act="auth-back">Ganti kontak</button><button class="btn ghost sm" type="button" data-act="auth-resend">Kirim ulang kode</button></div>
+    </form>`;
+  }
+  return `<div class="wrap"><div class="center" style="gap:22px"><div class="authbox">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center">${logo(64)}<h2 style="font-size:26px">${masuk?'Masuk ke Kultara Access':'Buat akun baru'}</h2><p class="muted">Pencatatan santri peserta kultum</p></div>
+    <div style="display:flex;justify-content:center"><div class="seg" role="group" aria-label="Pilih masuk atau daftar">
+      <button type="button" data-act="auth-tab" data-v="masuk" aria-pressed="${masuk}">Masuk</button>
+      <button type="button" data-act="auth-tab" data-v="daftar" aria-pressed="${!masuk}">Akun baru</button></div></div>
+    <div class="panel">${body}</div></div></div></div>`;
+}
+
+function shell(inner){
+  const nm=S.user?S.user.nama:'';
+  return `<header class="top"><div class="wrap"><div class="brand">${logo(36)}<div><b>Kultara Access</b><small>Kultum</small></div></div>
+    <div class="who"><span title="${esc(nm)}">${esc(nm)}</span><button class="btn ghost sm" data-act="logout">Keluar</button></div></div></header>
+    <div class="wrap"><main>${inner}</main><p class="foot">${store.persistent?'Data tersimpan di IndexedDB browser ini.':'Penyimpanan browser tidak tersedia. Data hilang saat halaman ditutup.'}</p></div>`;
+}
+
+const ICON={
+  data:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+  nama:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3-5.5 6.5-5.5s5.9 1.9 6.5 5.5M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.8c1.9.7 3.1 2.3 3.5 5.2"/></svg>',
+  input:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>'
+};
+const CHEV='<svg class="chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>';
+
+function home(){
+  const n=store.santri.length,put=store.santri.filter(s=>s.jenis==='putra').length;
+  const [a,b]=range('bulan',new Date()),r=recsIn(a,b,'semua');
+  const sesi=new Set(r.map(x=>x.tanggal)).size,h=r.filter(x=>x.status==='hadir').length,p=pctOf(h,r.length);
+  const menu=(k,t,d,opts)=>`<section class="menu" data-open="${S.open===k}"><button data-act="toggle" data-v="${k}" aria-expanded="${S.open===k}"><span class="ico">${ICON[k]}</span><span><h3>${t}</h3><span class="muted">${d}</span></span>${CHEV}</button>
+    <div class="opts">${opts.map(o=>`<button class="opt" data-act="go" data-v="${o[0]}" data-x="${o[1]||''}">${o[2]}<small>${o[3]}</small></button>`).join('')}</div></section>`;
+  return `<div class="hello"><h2>Hayyatuna kulluha ibadah</h2><p class="muted">${esc((S.user.nama||'').split(' ')[0])} · ${fmt(new Date(),{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</p></div>
+  <div class="stats"><div class="stat"><b class="num">${n}</b><span>Santri terdaftar</span></div><div class="stat"><b class="num">${put} / ${n-put}</b><span>Putra / putri</span></div><div class="stat"><b class="num">${sesi}</b><span>Kultum bulan ini</span></div><div class="stat"><b class="num">${p===null?'–':p+'%'}</b><span>Hadir bulan ini</span></div></div>
+  <div class="menus">
+   ${menu('data','Data Santri','Rekap kehadiran kultum',[['laporan','minggu','Per Minggu','Pekan berjalan'],['laporan','bulan','Per Bulan','Rekap bulanan'],['laporan','tahun','Per Tahun','Rekap tahunan']])}
+   ${menu('nama','Nama Santri','Daftar santri per kelas atau angkatan',[['santri','putra','Santri Putra','Per kelas / angkatan'],['santri','putri','Santri Putri','Per kelas / angkatan']])}
+   ${menu('input','Input Data Santri','Catat kehadiran dan tambah santri',[['absen','','Absensi Kultum','Catat kehadiran hari ini'],['tambah','','Tambah Santri','Santri baru']])}
+  </div>`;
+}
+
+function crumb(title,extra=''){return `<div class="crumb"><button class="iconbtn" data-act="go" data-v="home" aria-label="Kembali ke beranda"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><h2>${title}</h2>${extra}</div>`}
+const seg=(act,opts,cur,label)=>`<div class="seg" role="group" aria-label="${label}">${opts.map(o=>`<button type="button" data-act="${act}" data-v="${o[0]}" aria-pressed="${cur===o[0]}">${o[1]}</button>`).join('')}</div>`;
+const loading=()=>`<div class="empty"><p class="muted">Memuat data…</p></div>`;
+const sampleBtn=()=>`<button class="btn ghost" data-act="sample">Isi data contoh</button>`;
+
+function laporan(){
+  const {p,anchor,jenis}=S.lap,[a,b]=range(p,anchor),m=smap();
+  const recs=recsIn(a,b,jenis),sesi=new Set(recs.map(r=>r.tanggal)).size;
+  const list=store.santri.filter(s=>jenis==='semua'||s.jenis===jenis).sort((x,y)=>x.nama.localeCompare(y.nama,'id'));
+  const rows=list.map(s=>{const rs=recs.filter(r=>r.santriId===s.id),c=k=>rs.filter(r=>r.status===k).length;return {s,h:c('hadir'),i:c('izin'),k:c('sakit'),a:c('alfa'),t:rs.length}});
+  const hadir=recs.filter(r=>r.status==='hadir').length,avg=pctOf(hadir,recs.length);
+  // chart
+  let bars=[],labels=[];
+  if(p==='tahun'){
+    for(let i=0;i<12;i++){const rs=recs.filter(r=>+r.tanggal.slice(5,7)===i+1);bars.push(pctOf(rs.filter(r=>r.status==='hadir').length,rs.length));labels.push(['J','F','M','A','M','J','J','A','S','O','N','D'][i])}
+  }else{
+    const n=Math.round((b-a)/864e5)+1;
+    for(let i=0;i<n;i++){const d=ymd(addDays(a,i)),rs=recs.filter(r=>r.tanggal===d);bars.push(pctOf(rs.filter(r=>r.status==='hadir').length,rs.length));
+      labels.push(p==='minggu'?fmt(addDays(a,i),{weekday:'short'}):((i+1)%5===0||i===0?String(i+1):''))}
+  }
+  const chart=`<div class="chart" role="img" aria-label="Persentase hadir per ${p==='tahun'?'bulan':'hari'}">${bars.map((v,i)=>`<div class="b ${v===null?'e':''}" title="${labels[i]||i+1}: ${v===null?'tidak ada kultum':v+'%'}"><i style="height:${v===null?2:v}%"></i></div>`).join('')}</div><div class="axis">${labels.map(l=>`<span>${l}</span>`).join('')}</div>`;
+  return `${crumb('Data Santri')}
+  <div class="row between">${seg('lap-p',[['minggu','Minggu'],['bulan','Bulan'],['tahun','Tahun']],p,'Periode')}${seg('lap-j',[['semua','Semua'],['putra','Putra'],['putri','Putri']],jenis,'Filter santri')}</div>
+  <div class="period"><button class="iconbtn" data-act="lap-nav" data-v="-1" aria-label="Periode sebelumnya">‹</button><b>${rangeLabel(p,anchor)}</b><button class="iconbtn" data-act="lap-nav" data-v="1" aria-label="Periode berikutnya">›</button><button class="btn ghost sm" data-act="lap-now">Hari ini</button></div>
+  ${!store.ready?loading():!store.santri.length?`<div class="empty"><h3>Belum ada santri</h3><p class="muted">Tambahkan santri dulu, lalu catat kehadiran kultum.</p><div class="row" style="justify-content:center"><button class="btn" data-act="go" data-v="tambah">Tambah santri</button>${sampleBtn()}</div></div>`:`
+  <div class="stats"><div class="stat"><b class="num">${sesi}</b><span>Kultum diadakan</span></div><div class="stat"><b class="num">${avg===null?'–':avg+'%'}</b><span>Rata-rata hadir</span></div><div class="stat"><b class="num">${recs.filter(r=>r.status==='izin').length+recs.filter(r=>r.status==='sakit').length}</b><span>Izin + sakit</span></div><div class="stat"><b class="num">${recs.filter(r=>r.status==='alfa').length}</b><span>Alfa</span></div></div>
+  <div class="panel"><h3 style="font-size:16px;margin-bottom:10px">Kehadiran per ${p==='tahun'?'bulan':'hari'}</h3>${chart}</div>
+  <div class="tablewrap"><table><thead><tr><th>Nama</th><th>Kelas</th><th class="n">Hadir</th><th class="n">Izin</th><th class="n">Sakit</th><th class="n">Alfa</th><th>Kehadiran</th></tr></thead><tbody>
+  ${rows.length?rows.map(r=>{const pc=pctOf(r.h,r.t);return `<tr><td><b>${esc(r.s.nama)}</b></td><td class="muted">${esc(r.s.jenis==='putra'?'Putra':'Putri')} · ${esc(r.s.kelas||'–')}</td><td class="n">${r.h}</td><td class="n">${r.i}</td><td class="n">${r.k}</td><td class="n">${r.a}</td><td><div class="pct"><i><s style="width:${pc||0}%"></s></i><span>${pc===null?'–':pc+'%'}</span></div></td></tr>`}).join(''):'<tr><td colspan="7" class="muted">Tidak ada santri pada filter ini.</td></tr>'}
+  </tbody></table></div>`}`;
+}
+
+function santriPage(){
+  const j=S.nama.jenis,list=store.santri.filter(s=>s.jenis===j);
+  const [a,b]=range('tahun',new Date()),recs=recsIn(a,b,'semua');
+  const groups={};list.forEach(s=>(groups[s.kelas||'Tanpa kelas']??=[]).push(s));
+  const keys=Object.keys(groups).sort((x,y)=>x.localeCompare(y,'id',{numeric:true}));
+  return `${crumb('Nama Santri')}
+  <div class="row between">${seg('nama-j',[['putra','Santri Putra'],['putri','Santri Putri']],j,'Jenis santri')}<span class="row"><button class="btn sm" data-act="go" data-v="tambah">Tambah santri</button>${store.santri.some(s=>s.contoh)?'<button class="btn ghost sm" data-act="sample-del">Hapus data contoh</button>':''}</span></div>
+  ${!store.ready?loading():!list.length?`<div class="empty"><h3>Belum ada santri ${j}</h3><p class="muted">Santri yang ditambahkan akan muncul di sini, dikelompokkan per kelas atau angkatan.</p><div class="row" style="justify-content:center"><button class="btn" data-act="go" data-v="tambah">Tambah santri</button>${store.santri.length?'':sampleBtn()}</div></div>`:
+  keys.map(k=>`<section class="group"><h3>Kelas / angkatan ${esc(k)} <em>${groups[k].length} santri</em></h3>${groups[k].sort((x,y)=>x.nama.localeCompare(y.nama,'id')).map(s=>{
+    const rs=recs.filter(r=>r.santriId===s.id),pc=pctOf(rs.filter(r=>r.status==='hadir').length,rs.length);
+    return `<div class="santri"><span class="av">${esc(s.nama.trim()[0]||'?').toUpperCase()}</span><div class="nm"><b>${esc(s.nama)}${s.contoh?'<span class="tag">contoh</span>':''}</b><span class="hint">${pc===null?'Belum ada data kehadiran':'Hadir tahun ini '+pc+'% ('+rs.length+' kultum)'}</span></div>
+    ${S.delId===s.id?`<button class="btn danger sm" data-act="del-yes" data-v="${s.id}">Hapus</button><button class="btn ghost sm" data-act="del-no">Batal</button>`:`<button class="btn ghost sm" data-act="del" data-v="${s.id}" aria-label="Hapus ${esc(s.nama)}">Hapus</button>`}</div>`}).join('')}</section>`).join('')}`;
+}
+
+function absen(){
+  const ab=S.abs,list=store.santri.filter(s=>s.jenis===ab.jenis&&(ab.kelas==='semua'||s.kelas===ab.kelas)).sort((x,y)=>x.nama.localeCompare(y.nama,'id'));
+  const kelas=[...new Set(store.santri.filter(s=>s.jenis===ab.jenis).map(s=>s.kelas).filter(Boolean))].sort();
+  const cur=id=>ab.st[id]||'hadir';
+  return `${crumb('Absensi Kultum')}
+  <div class="row between">${seg('input-v',[['absen','Absensi Kultum'],['tambah','Tambah Santri']],'absen','Jenis input')}</div>
+  <div class="panel"><div class="grid2">
+    <div class="field"><label for="ab-tgl">Tanggal kultum</label><input id="ab-tgl" type="date" value="${ab.tanggal}" data-bind="abs.tanggal" data-reload="1"></div>
+    <div class="field"><label for="ab-tema">Tema kultum (opsional)</label><input id="ab-tema" value="${esc(ab.tema)}" placeholder="Contoh: Adab terhadap guru" data-bind="abs.tema"></div>
+    <div class="field"><label for="ab-kelas">Kelas / angkatan</label><select id="ab-kelas" data-bind="abs.kelas" data-reload="1"><option value="semua">Semua</option>${kelas.map(k=>`<option ${k===ab.kelas?'selected':''}>${esc(k)}</option>`).join('')}</select></div>
+  </div><div style="margin-top:12px">${seg('abs-j',[['putra','Santri Putra'],['putri','Santri Putri']],ab.jenis,'Jenis santri')}</div></div>
+  ${!store.ready?loading():!list.length?`<div class="empty"><h3>Belum ada santri</h3><p class="muted">Tambahkan santri ${ab.jenis} untuk mulai mencatat kehadiran.</p><div class="row" style="justify-content:center"><button class="btn" data-act="go" data-v="tambah">Tambah santri</button>${store.santri.length?'':sampleBtn()}</div></div>`:`
+  <div class="row between"><span class="muted">${list.length} santri · tandai yang tidak hadir</span><button class="btn ghost sm" data-act="abs-all">Semua hadir</button></div>
+  <div class="rollcall">${list.map(s=>`<div class="rc"><span class="nm">${esc(s.nama)} <span class="hint">${esc(s.kelas||'')}</span></span><div class="st" role="group" aria-label="Status ${esc(s.nama)}">${['hadir','izin','sakit','alfa'].map(k=>`<button type="button" data-act="abs-st" data-id="${s.id}" data-v="${k}" aria-pressed="${cur(s.id)===k}">${k[0].toUpperCase()+k.slice(1)}</button>`).join('')}</div></div>`).join('')}</div>
+  <button class="btn" data-act="abs-save" ${ab.saving?'disabled':''}>${ab.saving?'Menyimpan…':'Simpan absensi '+fmt(parse(ab.tanggal),{day:'numeric',month:'long'})}</button>`}`;
+}
+
+function tambah(){
+  const d=S.add;
+  return `${crumb('Tambah Santri')}
+  <div class="row between">${seg('input-v',[['absen','Absensi Kultum'],['tambah','Tambah Santri']],'tambah','Jenis input')}</div>
+  <form class="panel" data-form="add" novalidate style="display:flex;flex-direction:column;gap:14px;max-width:520px">
+    <div class="field"><label for="ad-nama">Nama santri</label><input id="ad-nama" value="${esc(d.nama)}" data-bind="add.nama" autocomplete="off" placeholder="Nama lengkap"></div>
+    <div class="field"><label for="ad-j">Santri</label><select id="ad-j" data-bind="add.jenis"><option value="putra" ${d.jenis==='putra'?'selected':''}>Putra</option><option value="putri" ${d.jenis==='putri'?'selected':''}>Putri</option></select></div>
+    <div class="field"><label for="ad-k">Kelas / angkatan</label><input id="ad-k" list="kl" value="${esc(d.kelas)}" data-bind="add.kelas" autocomplete="off" placeholder="Contoh: Kelas 7 atau Angkatan 2025"><datalist id="kl">${kelasList().map(k=>`<option value="${esc(k)}">`).join('')}</datalist></div>
+    <button class="btn" type="submit">Simpan santri</button>
+  </form>
+  <p class="hint">Setelah disimpan, santri langsung muncul di daftar absensi dan di menu Nama Santri.</p>`;
+}
+
+function viewHTML(){
+  switch(S.view){case 'laporan':return laporan();case 'santri':return santriPage();case 'absen':return absen();case 'tambah':return tambah();default:return home()}
+}
+
+/* ---------- render ---------- */
+function render(){
+  const root=$('#app');
+  root.innerHTML=S.screen==='splash'?splash():S.screen==='auth'?auth():shell(viewHTML());
+  if(S.screen==='splash'){clearTimeout(render.t);render.t=setTimeout(()=>{if(S.screen==='splash')next()},2700)}
+  const f=root.querySelector('[data-autofocus]');if(f)f.focus();
+}
+function softRender(){
+  if(S.screen==='splash')return;
+  const el=document.activeElement;
+  if(el&&/INPUT|SELECT/.test(el.tagName)&&el.closest('#app'))return;
+  render();
+}
+let initP;
+async function next(){try{await initP}catch(e){}S.screen=S.user?'app':'auth';S.view='home';render()}
+
+/* ---------- actions ---------- */
+function setPath(path,v){const [o,k]=path.split('.');({abs:S.abs,add:S.add})[o][k]=v}
+function isContact(c){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c)||/^\+?\d{9,15}$/.test(c)}
+const normContact=c=>{c=c.trim();return c.includes('@')?c.toLowerCase():c.replace(/[\s-]/g,'')};
+
+async function loadAbsen(){
+  const t=S.abs.tanggal,m={};
+  store.kultum.filter(r=>r.tanggal===t).forEach(r=>m[r.santriId]=r.status);
+  S.abs.st=m;
+  const ex=store.kultum.find(r=>r.tanggal===t&&r.tema);S.abs.tema=ex?ex.tema:'';
+}
+
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.dataset.bind&&!t.dataset.reload)setPath(t.dataset.bind,t.value);
+  if(t.name==='nama')A.nama=t.value;
+  if(t.name==='contact')A.contact=t.value;
+  if(t.name==='kode')A.input=t.value;
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.dataset.bind&&t.dataset.reload){setPath(t.dataset.bind,t.value);if(t.dataset.bind==='abs.tanggal')loadAbsen();render()}
+});
+
+document.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const f=e.target.dataset.form;
+  if(f==='auth1'){
+    const c=normContact(A.contact);A.contact=c;A.err='';
+    let acc=null;try{acc=isContact(c)?await idb.get('accounts',c):null}catch(err){A.err='Penyimpanan browser tidak bisa dibaca.'}
+    if(A.err){}
+    else if(A.tab==='daftar'&&!A.nama.trim())A.err='Isi nama lengkap Anda.';
+    else if(!isContact(c))A.err='Isi email yang benar atau nomor telepon 9–15 digit.';
+    else if(A.tab==='masuk'&&!acc)A.err='Akun belum terdaftar. Pilih "Akun baru" untuk mendaftar.';
+    else if(A.tab==='daftar'&&acc)A.err='Kontak ini sudah terdaftar. Pilih "Masuk".';
+    if(!A.err){A.code=String(Math.floor(100000+Math.random()*900000));A.step='kode';A.input=''}
+    render();
+  }
+  if(f==='auth2'){
+    if(A.input.trim()!==A.code){A.err='Kode tidak cocok. Periksa kembali atau kirim ulang kode.';render();return}
+    try{
+      let acc=await idb.get('accounts',A.contact);
+      const ops=[];
+      if(A.tab==='daftar'){acc={contact:A.contact,nama:A.nama.trim(),dibuat:Date.now()};ops.push(['accounts','put',acc])}
+      if(!acc){A.err='Akun tidak ditemukan.';render();return}
+      ops.push(['meta','put',{key:'session',contact:acc.contact,masuk:Date.now()}]);
+      await idb.run(ops);
+      S.user={nama:acc.nama,contact:acc.contact};
+    }catch(err){A.err='Akun gagal disimpan ke penyimpanan browser. Coba lagi.';render();return}
+    A.step='form';A.err='';A.input='';S.screen='app';S.view='home';render();
+  }
+  if(f==='add'){
+    const d=S.add,nama=d.nama.trim();
+    if(!nama){toast('Isi nama santri.');return}
+    if(!d.kelas.trim()){toast('Isi kelas atau angkatan.');return}
+    try{
+      await store.saveSantri([{id:uid(),nama,jenis:d.jenis,kelas:d.kelas.trim(),dibuat:Date.now()}]);
+      toast(nama+' ditambahkan.');S.add.nama='';render();
+      const el=$('#ad-nama');if(el)el.focus();
+    }catch(err){writeErr(err)}
+  }
+});
+
+document.addEventListener('click',async e=>{
+  const t=e.target.closest('[data-act]');if(!t)return;
+  const a=t.dataset.act,v=t.dataset.v;
+  switch(a){
+    case 'skip':next();return;
+    case 'auth-tab':A.tab=v;A.step='form';A.err='';break;
+    case 'auth-back':A.step='form';A.err='';break;
+    case 'auth-resend':A.code=String(Math.floor(100000+Math.random()*900000));A.input='';A.err='';toast('Kode baru dibuat.');break;
+    case 'logout':
+      try{await idb.run([['meta','delete','session']])}catch(err){}
+      S.user=null;S.screen='auth';S.view='home';A.tab='masuk';A.step='form';A.contact='';A.err='';break;
+    case 'toggle':S.open=S.open===v?null:v;break;
+    case 'go':
+      S.view=v;S.delId=null;
+      if(v==='laporan'){S.lap.p=t.dataset.x||S.lap.p;S.lap.anchor=new Date()}
+      if(v==='santri')S.nama.jenis=t.dataset.x||S.nama.jenis;
+      if(v==='absen'){S.abs.tanggal=S.abs.tanggal||ymd(new Date());await loadAbsen()}
+      break;
+    case 'input-v':S.view=v;if(v==='absen')await loadAbsen();break;
+    case 'lap-p':S.lap.p=v;break;
+    case 'lap-j':S.lap.jenis=v;break;
+    case 'lap-now':S.lap.anchor=new Date();break;
+    case 'lap-nav':{
+      const d=new Date(S.lap.anchor),n=+v;
+      if(S.lap.p==='minggu')d.setDate(d.getDate()+7*n);
+      else if(S.lap.p==='bulan'){d.setDate(1);d.setMonth(d.getMonth()+n)}
+      else d.setFullYear(d.getFullYear()+n);
+      S.lap.anchor=d;break}
+    case 'nama-j':S.nama.jenis=v;S.delId=null;break;
+    case 'del':S.delId=v;break;
+    case 'del-no':S.delId=null;break;
+    case 'del-yes':
+      try{await store.removeSantri([v]);toast('Santri dan catatan kehadirannya dihapus.')}catch(err){writeErr(err)}
+      S.delId=null;break;
+    case 'abs-j':S.abs.jenis=v;S.abs.kelas='semua';break;
+    case 'abs-st':S.abs.st[t.dataset.id]=v;break;
+    case 'abs-all':
+      store.santri.filter(s=>s.jenis===S.abs.jenis&&(S.abs.kelas==='semua'||s.kelas===S.abs.kelas)).forEach(s=>S.abs.st[s.id]='hadir');break;
+    case 'abs-save':{
+      const ab=S.abs;if(ab.saving)return;
+      const list=store.santri.filter(s=>s.jenis===ab.jenis&&(ab.kelas==='semua'||s.kelas===ab.kelas));
+      if(!ab.tanggal){toast('Pilih tanggal kultum.');return}
+      ab.saving=true;render();
+      try{
+        await store.saveKultum(list.map(s=>({id:ab.tanggal+'_'+s.id,santriId:s.id,tanggal:ab.tanggal,status:ab.st[s.id]||'hadir',tema:ab.tema.trim(),...(s.contoh?{contoh:true}:{})})));
+        toast(`Absensi ${list.length} santri tersimpan.`);
+      }catch(err){writeErr(err)}
+      ab.saving=false;break}
+    case 'sample':await addSample();return;
+    case 'sample-del':
+      try{await store.removeSantri(store.santri.filter(s=>s.contoh).map(s=>s.id));toast('Data contoh dihapus.')}catch(err){writeErr(err)}
+      break;
+  }
+  render();
+});
+
+async function addSample(){
+  const names=[['Ahmad Fauzi','putra','Kelas 7'],['Muhammad Rizky','putra','Kelas 7'],['Abdullah Hakim','putra','Kelas 8'],['Zaidan Alfarizi','putra','Kelas 8'],['Aisyah Nur','putri','Kelas 7'],['Fatimah Zahra','putri','Kelas 7'],['Khadijah Salsabila','putri','Kelas 8'],['Maryam Azzahra','putri','Kelas 8']];
+  try{
+    const ids=[],rows=[];
+    for(const [nama,jenis,kelas] of names){const id=uid();ids.push(id);rows.push({id,nama,jenis,kelas,contoh:true,dibuat:Date.now()})}
+    await store.saveSantri(rows);
+    const offs=[0,2,7,9,14,16,35,70],today=new Date(),recs=[];
+    offs.forEach((o,di)=>ids.forEach((id,si)=>{
+      const r=(di*7+si*13)%10,status=r<7?'hadir':r===7?'izin':r===8?'sakit':'alfa',t=ymd(addDays(today,-o));
+      recs.push({id:t+'_'+id,santriId:id,tanggal:t,status,tema:'',contoh:true});
+    }));
+    await store.saveKultum(recs);
+    toast('Data contoh dimuat. Hapus lewat menu Nama Santri.');
+  }catch(err){writeErr(err)}
+  render();
+}
+
+/* ---------- start ---------- */
+render();
+initP=store.init().catch(e=>{store.ready=true;toast('Penyimpanan browser gagal dibuka.')}).then(()=>softRender());
+</script>
+
+</body></html>
